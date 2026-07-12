@@ -35,29 +35,54 @@ async function request(path: string, options: RequestInit = {}) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers,
-    credentials: 'include',
-  });
+  const url = `${BASE_URL}${path}`;
 
-  const text = await response.text();
-  let json: any;
-  if (text.length === 0) {
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: 'include',
+    });
+  } catch (err) {
+    throw new ApiError(0, 'NETWORK_ERROR', `Could not reach ${url}. Is the backend running?`);
+  }
+
+  if (response.status === 204) {
+    return { success: true, data: null };
+  }
+
+  const contentType = response.headers.get('content-type') ?? '';
+  const rawBody = await response.text();
+
+  let json: any = null;
+  if (rawBody.length === 0) {
     json = { success: response.ok, data: null };
-  } else {
+  } else if (contentType.includes('application/json')) {
     try {
-      json = JSON.parse(text);
-    } catch (err) {
-      throw new ApiError(response.status, 'PARSE_ERROR', 'Failed to parse JSON response');
+      json = JSON.parse(rawBody);
+    } catch {
+      throw new ApiError(
+        response.status,
+        'INVALID_JSON_RESPONSE',
+        `The server returned malformed JSON for ${url} (status ${response.status}).`
+      );
     }
+  } else {
+    const preview = rawBody.slice(0, 200).replace(/\s+/g, ' ').trim();
+    throw new ApiError(
+      response.status,
+      'UNEXPECTED_RESPONSE_TYPE',
+      `Expected a JSON response from ${url} but got "${contentType || 'unknown content-type'}" ` +
+        `(status ${response.status}). Preview: ${preview}`
+    );
   }
 
   if (!response.ok) {
     throw new ApiError(
       response.status,
       json?.code || 'UNKNOWN_ERROR',
-      json?.message || 'Server error',
+      json?.message || `Server error (${response.status}) at ${url}`,
       json?.errors || []
     );
   }
@@ -350,6 +375,17 @@ export const api = {
     getActivityLogs: async (filters: any = {}): Promise<ActivityLog[]> => {
       const query = new URLSearchParams(filters).toString();
       const res = await request(`/api/activity-logs?${query}`);
+      return res.data;
+    },
+    getReportStats: async (): Promise<any> => {
+      const res = await request('/api/reports');
+      return res.data;
+    },
+  },
+
+  dashboard: {
+    getSnapshot: async (): Promise<any> => {
+      const res = await request('/api/dashboard');
       return res.data;
     },
   },

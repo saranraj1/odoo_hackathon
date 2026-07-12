@@ -40,10 +40,17 @@ router.get('/', authenticateJWT, async (req, res, next) => {
     if (req.user!.role === Role.EMPLOYEE) {
       where.OR = [{ requestedById: req.user!.id }, { toEmployeeId: req.user!.id }];
     } else if (req.user!.role === Role.DEPARTMENT_HEAD && req.user!.departmentId) {
+      // TransferRequest has no relation fields for toEmployeeId/requestedById (scalars only),
+      // so department scoping goes through the member id set rather than a nested relation filter.
+      const deptMembers = await prisma.user.findMany({
+        where: { departmentId: req.user!.departmentId },
+        select: { id: true },
+      });
+      const deptMemberIds = deptMembers.map((u) => u.id);
       where.OR = [
         { toDepartmentId: req.user!.departmentId },
-        { toEmployee: { departmentId: req.user!.departmentId } },
-        { requestedBy: { departmentId: req.user!.departmentId } },
+        { toEmployeeId: { in: deptMemberIds } },
+        { requestedById: { in: deptMemberIds } },
       ];
     }
 

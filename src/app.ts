@@ -17,6 +17,8 @@ import bookingRoutes from './routes/booking.routes';
 import maintenanceRoutes from './routes/maintenance.routes';
 import auditRoutes from './routes/audit.routes';
 import activityLogRoutes from './routes/activityLog.routes';
+import dashboardRoutes from './routes/dashboard.routes';
+import reportRoutes from './routes/report.routes';
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 app.use('/api/audits', auditRoutes);
 app.use('/api/activity-logs', activityLogRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { api } from '../lib/api/client';
+import { api, ApiError } from '../lib/api/client';
 import { User } from '../lib/types';
 
 interface AuthContextType {
@@ -23,15 +23,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const loadMe = async () => {
+    setIsLoading(true);
+    let currentUser: User | null = null;
+
     try {
-      setIsLoading(true);
-      const currentUser = await api.auth.me();
-      setUser(currentUser);
+      currentUser = await api.auth.me();
     } catch (err) {
-      setUser(null);
-    } finally {
-      setIsLoading(false);
+      const isUnauthenticated = err instanceof ApiError && err.statusCode === 401;
+      if (!isUnauthenticated) {
+        // Not a real "logged out" response (network/proxy hiccup, transient 5xx, etc.)
+        // — give it one retry before treating the session as gone.
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        try {
+          currentUser = await api.auth.me();
+        } catch {
+          currentUser = null;
+        }
+      }
     }
+
+    setUser(currentUser);
+    setIsLoading(false);
   };
 
   useEffect(() => {

@@ -2,10 +2,23 @@ node_modules/
 dist/
 .env
 .env.local
+.env.test
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+!frontend/.env.example
 *.pdf
 docs/
 .reentry/
 .claude/
+.claude/**
+CLAUDE.local.md
 frontend/.next/
 *.tsbuildinfo
+*.log
+cookies.txt
+test-cookies.txt
+api-response-*.txt
+coverage/
 

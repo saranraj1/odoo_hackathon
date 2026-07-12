@@ -25,43 +25,18 @@ export default function ReportsPage() {
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    const calculateStats = async () => {
+    const loadStats = async () => {
       try {
         setLoading(true);
-        const assets = await api.assets.getAssets({});
-        const maintenance = await api.maintenance.getMaintenance({});
-        const allocations = await api.allocations.getAllocations({});
-
-        // 1. Utilization stats
-        const total = assets.length;
-        const allocated = assets.filter((a) => a.status === 'ALLOCATED').length;
-        const available = assets.filter((a) => a.status === 'AVAILABLE').length;
-        const inRepair = assets.filter((a) => a.status === 'UNDER_MAINTENANCE').length;
-        const rate = total > 0 ? Math.round((allocated / total) * 100) : 0;
-
-        // 2. Maintenance stats
-        const totalRepairs = maintenance.length;
-        const resolvedRepairs = maintenance.filter((m) => m.status === 'RESOLVED').length;
-        const totalCost = maintenance.reduce((sum, m) => sum + (m.cost || 0), 0);
-
-        // 3. Retirement Risk
-        const highRisk = assets.filter((a) => {
-          const ageMonths = (Date.now() - new Date(a.acquisitionDate).getTime()) / (1000 * 60 * 60 * 24 * 30);
-          return (a.condition === 'Damaged' || a.condition === 'Fair') && ageMonths > 12;
-        });
-
-        setStats({
-          utilization: { total, allocated, available, inRepair, rate },
-          maintenance: { totalRepairs, resolvedRepairs, totalCost },
-          retirement: { highRisk },
-        });
+        const reportStats = await api.reports.getReportStats();
+        setStats(reportStats);
       } catch (err) {
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    calculateStats();
+    loadStats();
   }, []);
 
   if (!permissions.canViewAllReports && !permissions.isDepartmentHead) {

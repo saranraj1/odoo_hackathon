@@ -6,6 +6,7 @@ const LEGAL_TRANSITIONS: Record<AssetStatus, Set<AssetStatus>> = {
     AssetStatus.ALLOCATED,
     AssetStatus.RESERVED,
     AssetStatus.UNDER_MAINTENANCE,
+    AssetStatus.LOST,
     AssetStatus.RETIRED,
     AssetStatus.DISPOSED,
   ]),
@@ -19,10 +20,12 @@ const LEGAL_TRANSITIONS: Record<AssetStatus, Set<AssetStatus>> = {
     AssetStatus.AVAILABLE,
     AssetStatus.ALLOCATED,
     AssetStatus.UNDER_MAINTENANCE,
+    AssetStatus.LOST,
   ]),
   [AssetStatus.UNDER_MAINTENANCE]: new Set([
     AssetStatus.AVAILABLE,
     AssetStatus.ALLOCATED,
+    AssetStatus.LOST,
     AssetStatus.RETIRED,
   ]),
   [AssetStatus.LOST]: new Set([
