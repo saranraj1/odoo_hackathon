@@ -32,7 +32,7 @@ export default function NotificationsPage() {
     if (user) {
       loadNotifications();
     }
-  }, [user]);
+  }, [user?.id]);
 
   const markRead = async (id: string) => {
     try {

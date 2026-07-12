@@ -29,7 +29,7 @@ export default function ActivityLogsPage() {
     if (permissions.canViewAllActivityLogs) {
       loadLogs();
     }
-  }, [permissions]);
+  }, [permissions.canViewAllActivityLogs]);
 
   if (!permissions.canViewAllActivityLogs) {
     return <PermissionDenied />;

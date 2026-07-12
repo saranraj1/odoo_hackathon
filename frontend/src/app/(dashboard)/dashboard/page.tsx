@@ -44,7 +44,7 @@ export default function DashboardPage() {
       }
     };
     loadDashboard();
-  }, [user]);
+  }, [user?.id]);
 
   if (loading) {
     return (
