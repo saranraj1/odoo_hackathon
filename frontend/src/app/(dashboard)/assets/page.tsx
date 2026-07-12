@@ -86,7 +86,7 @@ export default function AssetDirectoryPage() {
       }
     };
     loadAssets();
-  }, [user, permissions]);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Client side filters implementation for fast search preview
   const filteredAssets = assets.filter((a) => {

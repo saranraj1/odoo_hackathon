@@ -52,7 +52,7 @@ export default function AuditsListPage() {
 
   useEffect(() => {
     loadAudits();
-  }, [user, permissions]);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCreateCycle = async (e: React.FormEvent) => {
     e.preventDefault();

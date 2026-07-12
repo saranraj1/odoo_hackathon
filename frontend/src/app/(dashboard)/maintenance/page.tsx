@@ -80,7 +80,7 @@ export default function MaintenancePage() {
 
   useEffect(() => {
     loadRequests();
-  }, [user, permissions]);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Deciding: Approve ticket
   const handleApprove = async (id: string) => {
