@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-700 antialiased font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-slate-900 font-semibold;
+  }
+}
+
+@layer components {
+  /* Scrollbar custom styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-slate-100 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+  }
+
+  /* Shimmer gradient effect for skeletons */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(241, 245, 249, 1) 25%,
+      rgba(226, 232, 240, 1) 50%,
+      rgba(241, 245, 249, 1) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+/* Custom interactive animation wrappers */
+.btn-primary {
+  @apply bg-primary-500 text-white font-semibold py-2 px-4 rounded-md shadow-sm 
+         hover:bg-primary-600 hover:scale-[1.01] active:scale-[0.98] 
+         focus:outline-none focus:ring-2 focus:ring-primary-300 transition-all duration-150;
+}
+
+.btn-secondary {
+  @apply bg-white border border-slate-300 text-slate-700 font-medium py-2 px-4 rounded-md shadow-xs
+         hover:bg-slate-50 hover:border-slate-400 active:bg-slate-100
+         focus:outline-none focus:ring-2 focus:ring-primary-300 transition-all duration-150;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-slate-600 hover:bg-slate-100 active:bg-slate-200 
+         py-2 px-4 rounded-md transition-all duration-150;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white font-semibold py-2 px-4 rounded-md shadow-sm
+         hover:bg-red-700 active:bg-red-800
+         focus:outline-none focus:ring-2 focus:ring-red-300 transition-all duration-150;
+}
+
+.card {
+  @apply bg-white border border-slate-200 rounded-xl p-6 shadow-sm
+         hover:shadow-md hover:-translate-y-[1px] transition-all duration-200;
+}
+
+.form-input {
+  @apply w-full h-10 px-3 border border-slate-300 rounded-md shadow-xs text-sm bg-white
+         placeholder-slate-400 focus:outline-none focus:border-primary-500 focus:ring-2 
+         focus:ring-primary-100 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed
+         transition-all duration-150;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-slate-700 mb-1.5;
+}
+
+.form-error {
+  @apply text-xs text-red-600 mt-1.5 animate-pulse;
+}
+}
