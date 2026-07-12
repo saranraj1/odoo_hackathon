@@ -38,15 +38,19 @@ async function request(path: string, options: RequestInit = {}) {
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers,
-    credentials: 'omit',
+    credentials: 'include',
   });
 
   const text = await response.text();
   let json: any;
-  try {
-    json = JSON.parse(text);
-  } catch (err) {
-    throw new ApiError(response.status, 'PARSE_ERROR', 'Failed to parse JSON response');
+  if (text.length === 0) {
+    json = { success: response.ok, data: null };
+  } else {
+    try {
+      json = JSON.parse(text);
+    } catch (err) {
+      throw new ApiError(response.status, 'PARSE_ERROR', 'Failed to parse JSON response');
+    }
   }
 
   if (!response.ok) {
@@ -86,6 +90,13 @@ export const api = {
     me: async (): Promise<User> => {
       const res = await request('/api/auth/me');
       return res.data;
+    },
+
+    changePassword: async (body: { currentPassword: string; newPassword: string }): Promise<void> => {
+      await request('/api/auth/password', {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+      });
     },
 
     forgotPassword: async (body: { email: string }): Promise<void> => {
@@ -247,6 +258,13 @@ export const api = {
         method: 'POST',
       });
     },
+    rescheduleBooking: async (id: string, body: { startAt: string; endAt: string }): Promise<Booking> => {
+      const res = await request(`/api/bookings/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+      });
+      return res.data;
+    },
   },
 
   maintenance: {
@@ -286,6 +304,17 @@ export const api = {
     },
     getCycleById: async (id: string): Promise<AuditCycle & { items: AuditItem[] }> => {
       const res = await request(`/api/audits/${id}`);
+      return res.data;
+    },
+    activateCycle: async (id: string): Promise<AuditCycle> => {
+      const res = await request(`/api/audits/${id}/activate`, { method: 'POST' });
+      return res.data;
+    },
+    assignAuditors: async (id: string, body: { auditorIds: string[]; assignedScope: string }): Promise<AuditCycle> => {
+      const res = await request(`/api/audits/${id}/assign`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+      });
       return res.data;
     },
     submitItemVerification: async (cycleId: string, itemId: string, body: any): Promise<AuditItem> => {
