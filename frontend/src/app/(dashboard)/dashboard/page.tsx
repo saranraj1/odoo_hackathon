@@ -54,7 +54,7 @@ export default function DashboardPage() {
             assetId: a.assetId,
             assetTag: assetObj?.assetTag || 'AF-XXXX',
             assetName: assetObj?.name || 'Unknown Asset',
-            employeeName: empObj?.name || 'Priya Patel', // Fallback
+            employeeName: empObj?.name || 'Unknown employee',
             expectedReturnAt: a.expectedReturnAt || '',
           };
         });
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                     <div className="w-2 h-2 rounded-full bg-primary-500 mt-2 shrink-0 animate-pulse" />
                     <div className="flex-1">
                       <p className="text-slate-700 leading-normal">
-                        <strong className="text-slate-900">{log.actorName || 'User'}</strong> performed action{' '}
+                        <strong className="text-slate-900">{log.actor?.name || 'System'}</strong> performed action{' '}
                         <span className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-[11px] font-mono">
                           {log.action}
                         </span>{' '}

@@ -82,7 +82,7 @@ export default function Sidebar() {
           name: 'Activity Logs',
           path: '/activity',
           icon: History,
-          show: permissions.canViewAllActivityLogs || permissions.isDepartmentHead,
+          show: permissions.canViewAllActivityLogs,
         },
       ],
     },

@@ -26,12 +26,12 @@ export default function ActivityLogsPage() {
         setLoading(false);
       }
     };
-    if (permissions.canViewAllActivityLogs || permissions.isDepartmentHead) {
+    if (permissions.canViewAllActivityLogs) {
       loadLogs();
     }
   }, [permissions]);
 
-  if (!permissions.canViewAllActivityLogs && !permissions.isDepartmentHead) {
+  if (!permissions.canViewAllActivityLogs) {
     return <PermissionDenied />;
   }
 
@@ -89,7 +89,7 @@ export default function ActivityLogsPage() {
                       {new Date(log.timestamp).toLocaleString()}
                     </td>
                     <td className="p-3 font-semibold text-slate-700">
-                      {log.actorId === 'u-admin-1' ? 'Jane Admin' : log.actorId === 'u-manager-1' ? 'Bob Manager' : 'Employee'}
+                      {log.actor?.name || 'System'}
                     </td>
                     <td className="p-3 font-mono text-[11px] font-bold text-primary-650 bg-primary-50/20 px-2 py-0.5 rounded w-fit">
                       {log.action}

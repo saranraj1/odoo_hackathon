@@ -19,6 +19,16 @@ router.get('/', authenticateJWT, async (req, res, next) => {
   }
 });
 
+// POST /api/notifications/read-all (mark all as read)
+router.post('/read-all', authenticateJWT, async (req, res, next) => {
+  try {
+    await NotificationService.markAllAsRead(req.user!.id);
+    return sendSuccess(res, null, 'All notifications marked as read');
+  } catch (err) {
+    next(err);
+  }
+});
+
 // PATCH /api/notifications/:id (mark as read)
 router.patch('/:id', authenticateJWT, async (req, res, next) => {
   try {
