@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { usePermissions } from '../../../lib/hooks/usePermissions';
-import PermissionDenied from '../../../components/shared/PermissionDenied';
-import { api } from '../../../lib/api/client';
-import { Category, Department } from '../../../lib/types';
+import { usePermissions } from '../../../../lib/hooks/usePermissions';
+import PermissionDenied from '../../../../components/shared/PermissionDenied';
+import { api } from '../../../../lib/api/client';
+import { Category, Department } from '../../../../lib/types';
 import { ArrowLeft, Loader2, Save, Image, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 

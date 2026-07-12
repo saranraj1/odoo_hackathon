@@ -18,8 +18,10 @@ import {
   Calendar,
   Layers,
   Building,
+  Package,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import clsx from 'clsx';
 
 export default function AssetDirectoryPage() {
   const { user } = useAuth();

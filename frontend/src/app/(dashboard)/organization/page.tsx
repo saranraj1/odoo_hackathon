@@ -162,19 +162,6 @@ export default function OrgSetupPage() {
     if (!promoUser) return;
     try {
       await api.organization.promoteEmployee(promoUser.id, targetRole as any);
-      // If mock mode, manually push update to datastore
-      if (process.env.NEXT_PUBLIC_USE_MOCKS === 'true') {
-        db.addActivityLog({
-          id: `l-${Date.now()}`,
-          actorId: 'u-admin-1',
-          action: 'EMPLOYEE_ROLE_PROMOTION',
-          entityType: 'User',
-          entityId: promoUser.id,
-          beforeData: { role: promoUser.role },
-          afterData: { role: targetRole },
-          timestamp: new Date().toISOString(),
-        });
-      }
       setPromoUser(null);
       loadData();
     } catch (err: any) {
