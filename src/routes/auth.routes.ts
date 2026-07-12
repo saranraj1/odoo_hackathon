@@ -6,7 +6,7 @@ import { prisma } from '../config/db';
 import { env } from '../config/env';
 import { sendSuccess } from '../utils/response';
 import { authenticateJWT } from '../middleware/auth';
-import { BadRequestError, UnauthorizedError, ConflictError } from '../utils/errors';
+import { UnauthorizedError, ConflictError, InactiveAccountError } from '../utils/errors';
 import { Role, UserStatus } from '@prisma/client';
 import { ActivityLogService } from '../services/activity.service';
 
@@ -21,6 +21,11 @@ const signupSchema = z.object({
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string(),
+  newPassword: z.string().min(6),
 });
 
 router.post('/signup', async (req, res, next) => {
@@ -83,7 +88,7 @@ router.post('/login', async (req, res, next) => {
     }
 
     if (user.status === UserStatus.INACTIVE) {
-      throw new UnauthorizedError('Account is deactivated');
+      throw new InactiveAccountError();
     }
 
     const token = jwt.sign(
@@ -138,6 +143,31 @@ router.post('/logout', authenticateJWT, async (req, res, next) => {
 
 router.get('/me', authenticateJWT, (req, res) => {
   return sendSuccess(res, req.user);
+});
+
+router.patch('/password', authenticateJWT, async (req, res, next) => {
+  try {
+    const body = changePasswordSchema.parse(req.body);
+
+    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    if (!user || !(await bcrypt.compare(body.currentPassword, user.passwordHash))) {
+      throw new UnauthorizedError('Current password is incorrect');
+    }
+
+    const passwordHash = await bcrypt.hash(body.newPassword, 10);
+    await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+
+    await ActivityLogService.log({
+      actorId: user.id,
+      action: 'USER_PASSWORD_CHANGE',
+      entityType: 'User',
+      entityId: user.id,
+    });
+
+    return sendSuccess(res, null, 'Password updated successfully');
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post('/forgot-password', async (req, res, next) => {

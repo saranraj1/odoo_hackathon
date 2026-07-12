@@ -35,96 +35,8 @@ export default function DashboardPage() {
     const loadDashboard = async () => {
       try {
         setLoading(true);
-        const assets = await api.assets.getAssets({});
-        const bookings = await api.bookings.getBookings({});
-        const maintenance = await api.maintenance.getMaintenance({});
-        const transfers = await api.allocations.getTransfers({});
-        const allocations = await api.allocations.getAllocations({});
-        const logs = await api.reports.getActivityLogs({});
-        const emps = await api.organization.getEmployees({});
-
-        // Overdue returns logic
-        const overdue = allocations.filter(
-          (a) => a.status === 'ACTIVE' && a.expectedReturnAt && new Date(a.expectedReturnAt) < new Date()
-        ).map(a => {
-          const assetObj = assets.find(as => as.id === a.assetId);
-          const empObj = emps.find(e => e.id === a.employeeId);
-          return {
-            allocationId: a.id,
-            assetId: a.assetId,
-            assetTag: assetObj?.assetTag || 'AF-XXXX',
-            assetName: assetObj?.name || 'Unknown Asset',
-            employeeName: empObj?.name || 'Priya Patel', // Fallback
-            expectedReturnAt: a.expectedReturnAt || '',
-          };
-        });
-
-        // Filter metrics by role
-        let availCount = assets.filter((a) => a.status === 'AVAILABLE').length;
-        let allocCount = assets.filter((a) => a.status === 'ALLOCATED').length;
-        let maintCount = maintenance.filter((m) => m.status === 'PENDING' || m.status === 'APPROVED' || m.status === 'TECHNICIAN_ASSIGNED' || m.status === 'IN_PROGRESS').length;
-        let bookCount = bookings.filter((b) => b.status === 'UPCOMING' || b.status === 'ONGOING').length;
-        let transCount = transfers.filter((t) => t.status === 'REQUESTED').length;
-        let returnCount = allocations.filter((a) => a.status === 'ACTIVE' && a.expectedReturnAt).length;
-
-        // Customise per role scoping
-        if (permissions.isDepartmentHead && user.departmentId) {
-          const deptAssets = assets.filter((a) => a.owningDepartmentId === user.departmentId);
-          availCount = deptAssets.filter((a) => a.status === 'AVAILABLE').length;
-          allocCount = deptAssets.filter((a) => a.status === 'ALLOCATED').length;
-          maintCount = maintenance.filter((m) => {
-            const assetObj = assets.find(as => as.id === m.assetId);
-            return assetObj?.owningDepartmentId === user.departmentId;
-          }).length;
-        } else if (permissions.isEmployee) {
-          // Employee personal metrics
-          const myAllocations = allocations.filter((a) => a.employeeId === user.id && a.status === 'ACTIVE');
-          allocCount = myAllocations.length;
-          availCount = 0; // Not applicable
-          maintCount = maintenance.filter((m) => m.reporterId === user.id && m.status !== 'RESOLVED').length;
-          bookCount = bookings.filter((b) => b.bookedById === user.id && (b.status === 'UPCOMING' || b.status === 'ONGOING')).length;
-          transCount = transfers.filter((t) => t.requestedById === user.id && t.status === 'REQUESTED').length;
-          returnCount = myAllocations.filter((a) => a.expectedReturnAt && new Date(a.expectedReturnAt) < new Date()).length;
-        }
-
-        // Approvals queue
-        const approvals: any[] = [];
-        if (permissions.canApproveTransfers) {
-          transfers.filter((t) => t.status === 'REQUESTED').forEach((t) => {
-            const assetObj = assets.find(as => as.id === t.assetId);
-            approvals.push({
-              id: t.id,
-              type: 'transfer',
-              title: `Transfer request for ${assetObj?.name || 'Asset'}`,
-              createdAt: t.createdAt,
-            });
-          });
-        }
-        if (permissions.canApproveMaintenance) {
-          maintenance.filter((m) => m.status === 'PENDING').forEach((m) => {
-            const assetObj = assets.find(as => as.id === m.assetId);
-            approvals.push({
-              id: m.id,
-              type: 'maintenance',
-              title: `Maintenance approval for ${assetObj?.name || 'Asset'}`,
-              createdAt: m.reportedAt,
-            });
-          });
-        }
-
-        setData({
-          kpis: {
-            assetsAvailable: availCount,
-            assetsAllocated: allocCount,
-            maintenanceToday: maintCount,
-            activeBookings: bookCount,
-            pendingTransfers: transCount,
-            upcomingReturns: returnCount,
-          },
-          overdueReturns: overdue,
-          recentActivity: logs.slice(0, 5),
-          pendingApprovals: approvals,
-        });
+        const snapshot = await api.dashboard.getSnapshot();
+        setData(snapshot);
       } catch (err) {
         console.error(err);
       } finally {
@@ -132,7 +44,7 @@ export default function DashboardPage() {
       }
     };
     loadDashboard();
-  }, [user, permissions]);
+  }, [user]);
 
   if (loading) {
     return (
@@ -268,7 +180,7 @@ export default function DashboardPage() {
                     <div className="w-2 h-2 rounded-full bg-primary-500 mt-2 shrink-0 animate-pulse" />
                     <div className="flex-1">
                       <p className="text-slate-700 leading-normal">
-                        <strong className="text-slate-900">{log.actorName || 'User'}</strong> performed action{' '}
+                        <strong className="text-slate-900">{log.actor?.name || 'System'}</strong> performed action{' '}
                         <span className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-[11px] font-mono">
                           {log.action}
                         </span>{' '}

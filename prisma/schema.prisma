@@ -87,16 +87,16 @@ enum ResolutionStatus {
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String      @id @default(uuid())
   name         String
-  email        String     @unique
+  email        String      @unique
   passwordHash String
-  role         Role       @default(EMPLOYEE)
-  status       UserStatus @default(ACTIVE)
+  role         Role        @default(EMPLOYEE)
+  status       UserStatus  @default(ACTIVE)
   departmentId String?
   department   Department? @relation("DeptEmployees", fields: [departmentId], references: [id])
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
   allocations         Allocation[]         @relation("EmployeeAllocations")
   bookings            Booking[]            @relation("UserBookings")
@@ -219,20 +219,20 @@ model TransferRequest {
 }
 
 model Booking {
-  id                String        @id @default(uuid())
-  assetId           String
-  asset             Asset         @relation("AssetBookings", fields: [assetId], references: [id])
-  bookedById        String
-  bookedBy          User          @relation("UserBookings", fields: [bookedById], references: [id])
-  departmentId      String?
-  startAt           DateTime
-  endAt             DateTime
-  purpose           String
-  status            BookingStatus @default(UPCOMING)
-  reminderTimestamp DateTime?
+  id                  String        @id @default(uuid())
+  assetId             String
+  asset               Asset         @relation("AssetBookings", fields: [assetId], references: [id])
+  bookedById          String
+  bookedBy            User          @relation("UserBookings", fields: [bookedById], references: [id])
+  departmentId        String?
+  startAt             DateTime
+  endAt               DateTime
+  purpose             String
+  status              BookingStatus @default(UPCOMING)
+  reminderTimestamp   DateTime?
   cancellationDetails String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 }
 
 model MaintenanceRequest {
@@ -259,21 +259,21 @@ model MaintenanceRequest {
 }
 
 model AuditCycle {
-  id                 String           @id @default(uuid())
-  name               String
-  scopeDepartmentId  String?
-  scopeDepartment    Department?      @relation("AuditCycleDept", fields: [scopeDepartmentId], references: [id])
-  scopeLocation      String?
-  startDate          DateTime
-  endDate            DateTime
-  status             AuditCycleStatus @default(DRAFT)
-  createdById        String
-  creator            User             @relation("AuditCycleCreator", fields: [createdById], references: [id])
-  closedById         String?
-  closer             User?            @relation("AuditCycleCloser", fields: [closedById], references: [id])
-  closedAt           DateTime?
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  id                String           @id @default(uuid())
+  name              String
+  scopeDepartmentId String?
+  scopeDepartment   Department?      @relation("AuditCycleDept", fields: [scopeDepartmentId], references: [id])
+  scopeLocation     String?
+  startDate         DateTime
+  endDate           DateTime
+  status            AuditCycleStatus @default(DRAFT)
+  createdById       String
+  creator           User             @relation("AuditCycleCreator", fields: [createdById], references: [id])
+  closedById        String?
+  closer            User?            @relation("AuditCycleCloser", fields: [closedById], references: [id])
+  closedAt          DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   assignments AuditAssignment[] @relation("CycleAssignments")
   items       AuditItem[]       @relation("CycleItems")

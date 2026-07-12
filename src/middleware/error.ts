@@ -24,7 +24,7 @@ export function errorHandler(
     return sendError(res, 'VALIDATION_ERROR', 'Validation failed', 400, errors);
   }
 
-  logger.error(`Unhandled Error: ${err.message}`, { stack: err.stack });
+  logger.error({ stack: err.stack }, `Unhandled Error: ${err.message}`);
 
   const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
   return sendError(res, 'INTERNAL_SERVER_ERROR', message, 500);

@@ -8,6 +8,7 @@ import StatusBadge from '../../../components/shared/StatusBadge';
 import EmptyState from '../../../components/shared/EmptyState';
 import { Bell, Loader2, Trash2, CheckSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { getNotificationRoute } from '../../../lib/notificationRoute';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
@@ -98,10 +99,8 @@ export default function NotificationsPage() {
                 key={n.id}
                 onClick={() => {
                   markRead(n.id);
-                  if (n.entityType && n.entityId) {
-                    const route = n.entityType.toLowerCase() === 'asset' ? `/assets/${n.entityId}` : `/${n.entityType.toLowerCase()}s`;
-                    router.push(route);
-                  }
+                  const route = getNotificationRoute(n.entityType, n.entityId);
+                  if (route) router.push(route);
                 }}
                 className={`py-4 flex items-start justify-between cursor-pointer hover:bg-slate-50/50 px-2 rounded-lg transition-colors relative ${
                   !n.readAt ? 'bg-primary-50/5' : ''

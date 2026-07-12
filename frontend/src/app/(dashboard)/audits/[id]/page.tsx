@@ -7,7 +7,6 @@ import { api } from '../../../../lib/api/client';
 import { AuditCycle, AuditItem, Asset, User } from '../../../../lib/types';
 import StatusBadge from '../../../../components/shared/StatusBadge';
 import ConfirmDialog from '../../../../components/shared/ConfirmDialog';
-import ConfirmDialog from '../../../../components/shared/ConfirmDialog';
 import {
   ArrowLeft,
   CheckCircle,
@@ -22,6 +21,7 @@ import {
   FileSpreadsheet,
 } from 'lucide-react';
 import Link from 'next/link';
+import clsx from 'clsx';
 
 export default function AuditDetailPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
@@ -90,8 +90,7 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
   // Activate cycle (DRAFT -> ACTIVE)
   const handleActivate = async () => {
     try {
-      // Direct API update
-      await api.audits.submitItemVerification(cycle.id, 'activate', { status: 'ACTIVE' });
+      await api.audits.activateCycle(cycle.id);
       loadCycleDetails();
     } catch (err: any) {
       alert(err.message || 'Activation failed.');
@@ -104,8 +103,7 @@ export default function AuditDetailPage({ params }: { params: { id: string } }) 
     if (selectedAuditorIds.length === 0) return;
 
     try {
-      // Submits assignments to backend
-      await api.audits.submitItemVerification(cycle.id, 'assign', { auditorIds: selectedAuditorIds });
+      await api.audits.assignAuditors(cycle.id, { auditorIds: selectedAuditorIds, assignedScope: assignScope });
       setAssignOpen(false);
       setSelectedAuditorIds([]);
       loadCycleDetails();

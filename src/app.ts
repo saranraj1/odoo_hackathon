@@ -2,6 +2,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { prisma } from './config/db';
+import { env } from './config/env';
 import { sendSuccess, sendError } from './utils/response';
 import { errorHandler } from './middleware/error';
 import authRoutes from './routes/auth.routes';
@@ -9,12 +10,21 @@ import departmentRoutes from './routes/department.routes';
 import categoryRoutes from './routes/category.routes';
 import employeeRoutes from './routes/employee.routes';
 import notificationRoutes from './routes/notification.routes';
+import assetRoutes from './routes/asset.routes';
+import allocationRoutes from './routes/allocation.routes';
+import transferRoutes from './routes/transfer.routes';
+import bookingRoutes from './routes/booking.routes';
+import maintenanceRoutes from './routes/maintenance.routes';
+import auditRoutes from './routes/audit.routes';
+import activityLogRoutes from './routes/activityLog.routes';
+import dashboardRoutes from './routes/dashboard.routes';
+import reportRoutes from './routes/report.routes';
 
 const app = express();
 
 // Middlewares
 app.use(cors({
-  origin: true,
+  origin: env.FRONTEND_ORIGIN,
   credentials: true,
 }));
 app.use(express.json());
@@ -26,6 +36,15 @@ app.use('/api/departments', departmentRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/assets', assetRoutes);
+app.use('/api/allocations', allocationRoutes);
+app.use('/api/transfers', transferRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/maintenance', maintenanceRoutes);
+app.use('/api/audits', auditRoutes);
+app.use('/api/activity-logs', activityLogRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Health Check
 app.get('/health', async (req, res) => {

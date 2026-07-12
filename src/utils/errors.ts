@@ -35,6 +35,12 @@ export class ForbiddenError extends AppError {
   }
 }
 
+export class InactiveAccountError extends AppError {
+  constructor(message: string = 'This account has been deactivated. Contact your administrator.') {
+    super(403, 'ACCOUNT_INACTIVE', message);
+  }
+}
+
 export class NotFoundError extends AppError {
   constructor(message: string = 'Not found') {
     super(404, 'NOT_FOUND', message);

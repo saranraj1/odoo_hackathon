@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { prisma } from '../config/db';
 import { logger } from '../config/logger';
 
@@ -62,5 +62,27 @@ export class NotificationService {
       where: { id, recipientId },
       data: { readAt: new Date() },
     });
+  }
+
+  static async markAllAsRead(recipientId: string) {
+    return prisma.notification.updateMany({
+      where: { recipientId, readAt: null },
+      data: { readAt: new Date() },
+    });
+  }
+
+  static async notifyRole(
+    role: Role,
+    params: Omit<CreateNotificationParams, 'recipientId'>,
+    tx?: Prisma.TransactionClient
+  ) {
+    const client = tx || prisma;
+    const recipients = await client.user.findMany({
+      where: { role, status: 'ACTIVE' },
+      select: { id: true },
+    });
+    await Promise.all(
+      recipients.map((r) => NotificationService.create({ ...params, recipientId: r.id }, tx))
+    );
   }
 }

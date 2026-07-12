@@ -48,8 +48,7 @@ export default function ProfilePage() {
 
     setLoading(true);
     try {
-      // Mock delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await api.auth.changePassword({ currentPassword, newPassword });
       setSuccess(true);
       setCurrentPassword('');
       setNewPassword('');
@@ -100,7 +99,7 @@ export default function ProfilePage() {
                 Department
               </span>
               <span className="font-semibold text-slate-800">
-                {departments.find((d) => d.id === user.departmentId)?.name || 'Engineering'}
+                {departments.find((d) => d.id === user.departmentId)?.name || 'Unassigned'}
               </span>
             </div>
             <div className="flex items-center text-slate-550 justify-between">

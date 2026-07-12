@@ -280,7 +280,7 @@ export default function BookingCalendarPage() {
                               </span>
                             </div>
                             <span>|</span>
-                            <span>Booked by {b.bookedBy?.name || 'Priya Patel'}</span>
+                            <span>Booked by {b.bookedBy?.name || 'Unknown user'}</span>
                           </div>
                         </div>
 
@@ -318,7 +318,7 @@ export default function BookingCalendarPage() {
                 </div>
               )}
 
-              <form onSubmit={handleCreateBooking} id="booking-form" className="space-y-4">
+              <form onSubmit={handleBookingSubmit} id="booking-form" className="space-y-4">
                 <div className="space-y-1">
                   <label className="form-label">Resource *</label>
                   <select

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env';
 import { prisma } from '../config/db';
-import { UnauthorizedError, ForbiddenError } from '../utils/errors';
+import { UnauthorizedError, InactiveAccountError } from '../utils/errors';
 import { Role, UserStatus } from '@prisma/client';
 
 export interface AuthUser {
@@ -57,7 +57,7 @@ export async function authenticateJWT(req: Request, res: Response, next: NextFun
     }
 
     if (user.status === UserStatus.INACTIVE) {
-      throw new ForbiddenError('Your account has been deactivated');
+      throw new InactiveAccountError();
     }
 
     req.user = user;

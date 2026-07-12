@@ -106,7 +106,7 @@ export default function ReturnsPage() {
                         </div>
                       </td>
                       <td className="p-3">
-                        <span className="font-medium text-slate-700">{holder?.name || 'Priya Patel'}</span>
+                        <span className="font-medium text-slate-700">{holder?.name || 'Unknown holder'}</span>
                       </td>
                       <td className="p-3 text-slate-550">
                         {a.returnedAt ? new Date(a.returnedAt).toLocaleDateString() : '—'}

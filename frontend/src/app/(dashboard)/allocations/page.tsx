@@ -19,6 +19,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import clsx from 'clsx';
 
 export default function AllocationsPage() {
   const { user } = useAuth();

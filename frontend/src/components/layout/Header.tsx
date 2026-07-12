@@ -7,6 +7,7 @@ import { api } from '../../lib/api/client';
 import { Notification } from '../../lib/types';
 import { Bell, LogOut, User, Settings, Check } from 'lucide-react';
 import Link from 'next/link';
+import { getNotificationRoute } from '../../lib/notificationRoute';
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -128,12 +129,8 @@ export default function Header() {
                       onClick={() => {
                         markRead(n.id);
                         setNotificationsOpen(false);
-                        if (n.entityType && n.entityId) {
-                          const route = n.entityType.toLowerCase() === 'asset' ? `/assets/${n.entityId}` : `/${n.entityType.toLowerCase()}s`;
-                          router.push(route);
-                        } else {
-                          router.push('/notifications');
-                        }
+                        const route = getNotificationRoute(n.entityType, n.entityId);
+                        router.push(route || '/notifications');
                       }}
                       className={`p-3 text-left hover:bg-slate-50 cursor-pointer transition-colors relative ${!n.readAt ? 'bg-primary-50/10' : ''}`}
                     >

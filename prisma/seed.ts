@@ -210,6 +210,79 @@ async function main() {
   });
 
   console.log('✅ Categories seeded.');
+
+  // 4. Seed demo assets for the connected-journey walkthrough
+  const roomB2 = await prisma.asset.upsert({
+    where: { assetTag: 'AF-0003' },
+    update: {},
+    create: {
+      assetTag: 'AF-0003',
+      serialNumber: 'SN-ROOM-B2',
+      name: 'Conference Room B2',
+      description: 'Shared 12-person meeting room with projector',
+      categoryId: categoryRooms.id,
+      owningDepartmentId: engDept.id,
+      location: 'Building B, Floor 2',
+      condition: 'Excellent',
+      status: 'AVAILABLE',
+      acquisitionDate: new Date('2025-06-01'),
+      acquisitionCost: 0,
+      isBookable: true,
+    },
+  });
+
+  const laptop = await prisma.asset.upsert({
+    where: { assetTag: 'AF-0114' },
+    update: {},
+    create: {
+      assetTag: 'AF-0114',
+      serialNumber: 'SN-ENG-0114',
+      name: 'Developer Laptop Pro',
+      description: '16-inch high-performance developer workstation',
+      categoryId: categoryElectronics.id,
+      owningDepartmentId: engDept.id,
+      location: 'Main Lab 3A',
+      condition: 'Good',
+      status: 'AVAILABLE',
+      acquisitionDate: new Date('2026-01-15'),
+      acquisitionCost: 2499.0,
+      isBookable: false,
+    },
+  });
+
+  console.log('✅ Demo assets seeded (Conference Room B2, Developer Laptop Pro - both AVAILABLE).');
+
+  // Pre-existing booking for Room B2 so the overlap-rejection demo step has
+  // something to conflict with. Anchored to "tomorrow" at seed time so it's
+  // always in the future no matter when this script actually runs.
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const bookingStart = new Date(tomorrow);
+  bookingStart.setHours(9, 0, 0, 0);
+  const bookingEnd = new Date(tomorrow);
+  bookingEnd.setHours(10, 0, 0, 0);
+
+  const existingBooking = await prisma.booking.findFirst({
+    where: { assetId: roomB2.id, purpose: 'Weekly Standup Engineering Team' },
+  });
+  if (!existingBooking) {
+    await prisma.booking.create({
+      data: {
+        assetId: roomB2.id,
+        bookedById: emp1.id,
+        departmentId: engDept.id,
+        startAt: bookingStart,
+        endAt: bookingEnd,
+        purpose: 'Weekly Standup Engineering Team',
+        status: 'UPCOMING',
+      },
+    });
+    console.log(
+      `✅ Room B2 booked ${bookingStart.toLocaleString()} - ${bookingEnd.toLocaleTimeString()}. ` +
+        `Use this date to test the booking overlap (09:30) and adjacent-slot (10:00) rules.`
+    );
+  }
+
   console.log('🌱 Database seeding completed successfully.');
 }
 

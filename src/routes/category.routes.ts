@@ -4,7 +4,7 @@ import { prisma } from '../config/db';
 import { sendSuccess } from '../utils/response';
 import { authenticateJWT } from '../middleware/auth';
 import { requireRole } from '../middleware/rbac';
-import { Role, Status } from '@prisma/client';
+import { Role, Status, Prisma } from '@prisma/client';
 import { ConflictError, NotFoundError } from '../utils/errors';
 import { ActivityLogService } from '../services/activity.service';
 
@@ -102,7 +102,12 @@ router.patch('/:id', authenticateJWT, requireRole([Role.ADMIN]), async (req, res
       data: {
         name: body.name,
         description: body.description,
-        metadataSchema: body.metadataSchema !== undefined ? body.metadataSchema : undefined,
+        metadataSchema:
+          body.metadataSchema === undefined
+            ? undefined
+            : body.metadataSchema === null
+            ? Prisma.JsonNull
+            : body.metadataSchema,
         status: body.status,
       },
     });
