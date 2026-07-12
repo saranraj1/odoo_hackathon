@@ -76,7 +76,7 @@ export default function AllocationsPage() {
 
   useEffect(() => {
     loadAllocationsData();
-  }, [user, permissions]);
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle Transfer Approval/Rejection decision
   const handleDecisionSubmit = async (decision: 'APPROVED' | 'REJECTED', note: string) => {
