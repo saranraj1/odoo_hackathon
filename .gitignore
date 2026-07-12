@@ -1,7 +1,11 @@
 node_modules/
 dist/
 .env
+.env.local
 *.pdf
 docs/
 .reentry/
+.claude/
+frontend/.next/
+*.tsbuildinfo
 
