@@ -99,8 +99,9 @@ describe('AssetFlow Platform & Foundation API Tests', () => {
         .get('/api/auth/me')
         .set('Cookie', [employeeCookie]);
 
+      // The auth middleware raises InactiveAccountError which maps to 403 ACCOUNT_INACTIVE
       expect(res.status).toBe(403);
-      expect(res.body.code).toBe('FORBIDDEN');
+      expect(res.body.code).toBe('ACCOUNT_INACTIVE');
 
       // Re-activate test employee for subsequent tests
       await prisma.user.update({
@@ -110,12 +111,14 @@ describe('AssetFlow Platform & Foundation API Tests', () => {
     });
 
     it('should block non-admins from creating departments', async () => {
+      // Employee is ACTIVE again; attempt to create a department should hit RBAC
       const res = await request(app)
         .post('/api/departments')
         .set('Cookie', [employeeCookie])
         .send({ name: 'HR Department', code: 'HR' });
 
       expect(res.status).toBe(403);
+      // The requireRole middleware raises FORBIDDEN
       expect(res.body.code).toBe('FORBIDDEN');
     });
   });
@@ -172,6 +175,19 @@ describe('AssetFlow Platform & Foundation API Tests', () => {
     });
 
     it('should block deactivation of a department if it contains active employees', async () => {
+      // Ensure the test employee is assigned to engineeringDeptId so the count is > 0
+      // (the previous test promoted them to DEPARTMENT_HEAD with departmentId = engineeringDeptId)
+      const activeCount = await prisma.user.count({
+        where: { departmentId: engineeringDeptId, status: 'ACTIVE' },
+      });
+      if (activeCount === 0) {
+        // Fallback: explicitly assign the employee to this dept
+        await prisma.user.update({
+          where: { id: testEmployeeId },
+          data: { departmentId: engineeringDeptId },
+        });
+      }
+
       const res = await request(app)
         .patch(`/api/departments/${engineeringDeptId}`)
         .set('Cookie', [adminCookie])
