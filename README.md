@@ -577,9 +577,10 @@ Create a `.env` file in the project root. Copy the structure from `.env.example`
 
 ```env
 PORT=3000
-DATABASE_URL="postgresql://username:password@localhost:5403/assetflow?schema=public"
+DATABASE_URL="postgresql://username:password@localhost:5432/assetflow?schema=public"
 JWT_SECRET="your-super-secure-jwt-secret-key-change-in-production"
 NODE_ENV="development"
+FRONTEND_ORIGIN="http://localhost:3001"
 ```
 
 Never commit the real `.env` file or production secrets.
@@ -604,13 +605,15 @@ npx prisma migrate dev --name init
 
 ### 7. Seed the Database
 
-Seed the database with demonstration departments, categories, users, assets, bookings, maintenance requests, and audit records.
+Seed the database with demonstration departments, categories, users, and
+two starter assets (a bookable conference room with an existing booking,
+and a laptop) used by the demonstration walkthrough below.
 
 ```bash
 npm run seed
 ```
 
-### 8. Start the Development Server
+### 8. Start the Backend Development Server
 
 ```bash
 npm run dev
@@ -622,7 +625,27 @@ The API will be available at:
 http://localhost:3000
 ```
 
-### 9. Run Tests
+### 9. Run the Frontend
+
+The frontend is a separate Next.js package in `frontend/`. In a second
+terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The app will be available at `http://localhost:3001` and proxies all
+`/api/*` calls to the backend (configurable via `frontend/.env` -
+copy from `frontend/.env.example`). Both servers must be running for
+the app to work; there is no combined root script for this yet.
+
+### 10. Run Tests
+
+Tests run against whatever `DATABASE_URL` is configured and will wipe
+data in the tables they cover - point this at a dedicated test database,
+never at data you want to keep.
 
 ```bash
 npm run test
